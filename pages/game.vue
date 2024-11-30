@@ -1,11 +1,14 @@
 <template>
   <div class="trainer">
     <div class="question-container">
-      <p class="math-task">{{ formattedQuestion }}</p>
+      <p v-if="formattedQuestion" class="math-task">{{ formattedQuestion }}</p>
     </div>
 
-    <div class="timer-bar">
-      <div class="progress" :style="{ width: progressWidth + '%' }"></div>
+    <!-- Таймер -->
+    <div class="timer-container">
+      <div class="timer-bar">
+        <div class="progress" :style="{ width: progressWidth + '%' }"></div>
+      </div>
     </div>
 
     <div class="keyboard">
@@ -34,6 +37,15 @@
         <button class="action-btn" @click="goToMainPage()">Назад</button>
       </div>
     </div>
+
+    <!-- Окно результата -->
+    <div v-if="gameFinished" class="result-overlay">
+      <div class="result-content">
+        <h2>Статистика раунда</h2>
+        <p>{{ resultText }}</p>
+        <button @click="goToMainPage" class="main-page-btn">На главную</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -48,12 +60,15 @@ const userAnswer = ref('');
 const isAnswerCorrect = ref(null);
 const questionText = ref('');
 const router = useRouter();
-const timeLeft = ref(60); 
+const timeLeft = ref(10); // Задаем время продолжительности игры
+const gameDuration = ref(10); // Задайте продолжительность (например, 20 секунд)
+timeLeft.value = gameDuration.value; // Инициализация времени
 const gameFinished = ref(false); 
 const solved = ref(0); 
 const skipped = ref(0); 
 const progressWidth = ref(100); 
 let timer;
+const resultText = ref('');
 
 // Форматированный вопрос с ответом
 const formattedQuestion = ref('');
@@ -85,24 +100,17 @@ const checkAnswer = () => {
 
   if (isAnswerCorrect.value) {
     solved.value++;
-    fadeOutAndGenerate();
-  } else {
-    clearAnswer();
+    fadeOutAndGenerate(); // Смена задачи только при правильном ответе
   }
-};
 
-// Пропуск задачи
-const skipQuestion = () => {
-  skipped.value++;
-  fadeOutAndGenerate();
+  // Проверяем условия завершения игры
+  checkGameEndConditions();
 };
 
 // Плавная смена задачи
 const fadeOutAndGenerate = () => {
-  formattedQuestion.value = ''; // Исчезает текст
-  setTimeout(() => {
-    generateQuestion(); // Появляется новый вопрос
-  }, 200);
+  formattedQuestion.value = null; // Полностью скрываем текст
+  generateQuestion(); // Быстрее появляется новая задача
 };
 
 // Таймер
@@ -110,12 +118,45 @@ const startTimer = () => {
   timer = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--;
-      progressWidth.value = (timeLeft.value / 60) * 100;
+      progressWidth.value = (timeLeft.value / gameDuration.value) * 100;
     } else {
-      clearInterval(timer);
-      gameFinished.value = true;
+       // Проверка завершения игры, когда таймер истек
+       checkGameEndConditions();
     }
   }, 1000);
+};
+
+// Проверка условий завершения игры
+const checkGameEndConditions = () => {
+  // Завершаем игру, если таймер закончился и есть решенные или пропущенные задачи
+  if (timeLeft.value === 0 && (isAnswerCorrect.value || skipped.value > 0)) {
+    finishGame();
+  }
+};
+
+// Пропуск задачи
+const skipQuestion = () => {
+  skipped.value++; // Увеличиваем количество пропущенных задач
+  generateQuestion(); // Генерируем новый вопрос
+};
+
+// Пропуск задачи
+const skipquestion = () => {
+  skipped.value++;
+  checkGameEndConditions(); // Проверка условий завершения
+};
+
+// Завершение игры
+const finishGame = () => {
+  if (!gameFinished.value) {  // Добавляем проверку, чтобы избежать многократного завершения
+    clearInterval(timer);
+    gameFinished.value = true;
+    
+    const totalTime = gameDuration.value - timeLeft.value;
+    const speed = totalTime > 0 ? (totalTime / (solved.value + skipped.value)).toFixed(0) : 0;
+
+    resultText.value = `Решено: ${solved.value} из ${solved.value + skipped.value}, скорость: ${speed} сек/задание`;
+  }
 };
 
 // Инициализация
@@ -149,7 +190,7 @@ const goToMainPage = () => {
 .question-container {
   background-color: #add8e6;
   width: calc(100% - 10px);
-  height: 40%;
+  height: 250px; /* размер высоты экрана */
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -157,15 +198,36 @@ const goToMainPage = () => {
   border-radius: 10px;
 }
 
-.math-task {
+.math-task, .placeholder {
   font-size: 36px;
   color: #000000;
   transition: opacity 0.2s ease-in-out;
 }
 
-.timer-bar {
+.math-task.hidden, .placeholder.hidden {
+  opacity: 0; /* Скрываем текст */
+}
+
+.timer-container {
+  display: flex;
+  justify-content: center;
   margin: 10px 0;
 }
+
+.timer-bar {
+  width: 90%;
+  height: 10px;
+  background-color: #cccccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #76c7c0;
+  transition: width 1s linear; /* Убедитесь, что анимация синхронизирована с таймером */
+}
+
 
 .keyboard {
   flex: 1;
@@ -208,6 +270,46 @@ const goToMainPage = () => {
   border: none;
   border-radius: 8px;
   height: 40px;
+}
+
+.result-overlay {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.915); /* полупрозрачный фон */
+  padding: 20px;
+  width: 300px; /* или другая фиксированная ширина */
+  height: 250px; /* или фиксированная высота */
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;  /* Центрирует по горизонтали */
+  margin-top: 20px;  /* Отступ сверху */
+  width: 100%;
+}
+
+.main-page-btn {
+  background-color: #4CAF50; /* Зеленый фон */
+  color: white; /* Белый текст */
+  padding: 8px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-left: 50%; /* Смещение кнопки правее к центру */
+  transform: translateX(-50%); /* Центрируем кнопки */
+}
+
+.main-page-btn:hover {
+  background-color: #45a049; /* Более темный зеленый при наведении */
 }
 
 </style>

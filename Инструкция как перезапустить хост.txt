@@ -1,0 +1,36 @@
+1. Перезапустите туннель с помощью команды ngrok http 3000 (или порта, на котором работает ваше приложение):
+- зайти в cmd, прейти в папку с ngrok, ввести команду ngrok http http://localhost:3000. Откроется туннель
+-
+
+2. Обновите ссылку в Telegram-боте, чтобы она использовала новый URL, который ngrok сгенерирует.
+
+- чтобы обновить ссылку webhook в коде, выполните следующие шаги:
+
+В Telegram-боте отправьте запрос к API с методом setWebhook, указав ваш новый URL.
+
+- Используйте команду curl или клиент для выполнения запроса на сервер:
+curl -F "url=https://your-new-url.com" https://api.telegram.org/bot<your-bot-token>/setWebhook
+
+- Проверьте, что webhook был успешно установлен, перейдя по следующему запросу:
+curl https://api.telegram.org/bot<your-bot-token>/getWebhookInfo
+
+Этот запрос можно выполнить в командной строке (CMD) или в терминале. Вот более подробные шаги:
+
+- Получите URL вашего нового ngrok туннеля. После того как вы перезапустили ngrok, новый URL будет выведен в терминале, например, https://your-new-url.ngrok.io.
+
+- Убедитесь, что у вас есть токен вашего Telegram бота. Токен можно получить через BotFather в Telegram (8187906136:AAF3R7t0ZxQ-uk3a4czzVAHn9f4dNCOynuU).
+
+- Выполните запрос для обновления webhook (в терминале перейти в папку с приложением):
+
+В командной строке или терминале выполните следующую команду:
+
+curl -F "url=https://your-new-url.ngrok.io" https://api.telegram.org/bot<your-bot-token>/setWebhook
+
+Замените:
+
+your-new-url.ngrok.io на URL вашего нового ngrok туннеля.
+<your-bot-token> на токен вашего Telegram бота.
+
+3. Перейти в BotFather, выбрать приложение, выбрать заменить URL, вставить ссылку из нового туннеля
+
+
