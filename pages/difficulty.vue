@@ -26,28 +26,28 @@ const store = useSettingsStore();
 
 const difficultyOptions = {
   addition: [
-    { label: 'Единицы + Единицы (25%)', value: 'easy' },
-    { label: 'Десятки + Десятки (50%)', value: 'medium' },
-    { label: 'Сотни + Сотни (75%)', value: 'hard' },
-    { label: 'Тысячи + Тысячи (100%)', value: 'expert' },
+    { label: '5+5 (25%)', value: 'easy' },
+    { label: '15+15 (50%)', value: 'medium' },
+    { label: '255+255 (75%)', value: 'hard' },
+    { label: '5255+5255 (100%)', value: 'expert' },
   ],
   subtraction: [
-    { label: 'Единицы - Единицы (25%)', value: 'easy' },
-    { label: 'Десятки - Десятки (50%)', value: 'medium' },
-    { label: 'Сотни - Сотни (75%)', value: 'hard' },
-    { label: 'Тысячи - Тысячи (100%)', value: 'expert' },
+    { label: '5-5 (25%)', value: 'easy' },
+    { label: '25-25 (50%)', value: 'medium' },
+    { label: '255-255 (75%)', value: 'hard' },
+    { label: '5255-5255 (100%)', value: 'expert' },
   ],
   multiplication: [
-    { label: 'Единицы × Единицы (25%)', value: 'easy' },
-    { label: 'Десятки × Единицы (50%)', value: 'medium' },
-    { label: 'Сотни × Единицы (75%)', value: 'hard' },
-    { label: 'Десятки × Десятки (100%)', value: 'expert' },
+    { label: '5×5 (25%)', value: 'easy' },
+    { label: '25×5 (50%)', value: 'medium' },
+    { label: '255×5 (75%)', value: 'hard' },
+    { label: '25×25 (100%)', value: 'expert' },
   ],
   division: [
-    { label: 'Десятки ÷ Единицы (25%)', value: 'easy' },
-    { label: 'Сотни ÷ Единицы (50%)', value: 'medium' },
-    { label: 'Тысячи ÷ Единицы (75%)', value: 'hard' },
-    { label: 'Тысячи ÷ Десятки (100%)', value: 'expert' },
+    { label: '25÷5 (25%)', value: 'easy' },
+    { label: '255÷5 (50%)', value: 'medium' },
+    { label: '2525÷5 (75%)', value: 'hard' },
+    { label: '2525÷25 (100%)', value: 'expert' },
   ],
 };
 
