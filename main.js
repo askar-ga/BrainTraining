@@ -1,11 +1,13 @@
+import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './app.vue';
 import router from './router';
 
 // Проверяем доступность API Telegram WebApp
-if (window.Telegram && window.Telegram.WebApp) {
+if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
   Telegram.WebApp.expand(); // Разворачиваем приложение на весь экран
-  Telegram.WebApp.disableClosingConfirmation(); // Отключаем запрос на подтверждение закрытия
+    
+  // Лог для отладки (можно убрать на продакшене)
   console.log('Telegram WebApp initialized:', Telegram.WebApp.initDataUnsafe);
 
   // Отключение свайпа только внутри приложения
@@ -23,5 +25,9 @@ if (window.Telegram && window.Telegram.WebApp) {
   console.warn('Telegram WebApp API is not available.');
 }
 
-// Инициализация Vue приложения
-createApp(App).use(router).mount('#app');
+const app = createApp(App);
+const pinia = createPinia();
+
+app.use(pinia);
+app.use(router);
+app.mount('#app');

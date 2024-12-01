@@ -7,7 +7,13 @@
 </template>
 
 <script setup>
-// Если необходима дополнительная логика, можно добавить её здесь.
+// Проверяем доступность Telegram WebApp API и разворачиваем приложение
+if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+  Telegram.WebApp.expand(); // Разворачиваем в полноэкранный режим
+  console.log('Telegram WebApp initialized:', Telegram.WebApp.initDataUnsafe);
+} else {
+  console.warn('Telegram WebApp API is not available.');
+}
 </script>
 
 <style scoped>
